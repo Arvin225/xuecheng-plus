@@ -212,9 +212,9 @@
                 <version>3.8.1</version>
                 <configuration>
                     <!--指定项目源码jdk的版本-->
-                    <source>17</source>
+                    <source>1.8</source>
                     <!--指定项目编译后的jdk的版本-->
-                    <target>17</target>
+                    <target>1.8</target>
                     <!--配置注解预编译-->
                     <annotationProcessorPaths>
                         <path>
