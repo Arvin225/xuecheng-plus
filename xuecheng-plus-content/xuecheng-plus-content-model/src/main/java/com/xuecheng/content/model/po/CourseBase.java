@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 /**
  * <p>
@@ -14,7 +14,7 @@ import java.util.Date;
  * </p>
  *
  * @author arvin
- * @since 2023-03-20 12:27:59
+ * @since 2023-03-20 12:50:46
  */
 @Getter
 @Setter
@@ -72,11 +72,11 @@ public class CourseBase {
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_date", fill = FieldFill.INSERT)
-    private Date createDate;
+    private LocalDateTime createDate;
 
     @ApiModelProperty("修改时间")
     @TableField(value = "change_date", fill = FieldFill.INSERT_UPDATE)
-    private Date changeDate;
+    private LocalDateTime changeDate;
 
     @ApiModelProperty("创建人")
     @TableField("create_people")
