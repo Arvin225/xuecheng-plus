@@ -9,3 +9,6 @@ Content-Type: application/json
 }
 
 <> 2023-03-21T014555.200.json
+
+###
+GET {{content_host}}/content/course-category/tree-nodes

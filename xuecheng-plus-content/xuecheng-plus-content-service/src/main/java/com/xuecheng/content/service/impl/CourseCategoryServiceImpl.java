@@ -23,6 +23,7 @@ public class CourseCategoryServiceImpl implements CourseCategoryService {
     public List<CourseCategoryTreeDto> queryTreeNodes() {
 
         LambdaQueryWrapper<CourseCategory> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.orderByAsc(CourseCategory::getOrderby);
         List<CourseCategory> courseCategoryList = courseCategoryMapper.selectList(queryWrapper);
 
         if (courseCategoryList.isEmpty()){
