@@ -33,5 +33,4 @@ logs/
 .vscode/
 
 ### Others ###
-tmp
-
+/tmp/
