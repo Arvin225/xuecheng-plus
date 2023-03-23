@@ -36,3 +36,27 @@ Content-Type: application/json
   "validDays": 365
 
 }
+
+###课程新增，异常测试
+POST {{content_host}}/content/course
+Content-Type: application/json
+
+{
+  "mt": "12001",
+  "st": "12010",
+  "name": "exception test",
+  "pic": "",
+  "teachmode": "200002",
+  "users": "exception test",
+  "tags": "exception test",
+  "grade": "204001",
+  "description": "exception test",
+  "charge": "201001",
+  "price": 0,
+  "originalPrice":1000,
+  "qq": "exception test",
+  "wechat": "exception test",
+  "phone": "exception test",
+  "validDays": 365
+
+}
