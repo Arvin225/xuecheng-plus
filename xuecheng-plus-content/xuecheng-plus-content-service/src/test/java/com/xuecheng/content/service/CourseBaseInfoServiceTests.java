@@ -2,6 +2,8 @@ package com.xuecheng.content.service;
 
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
+import com.xuecheng.content.model.dto.AddCourseDto;
+import com.xuecheng.content.model.dto.CourseBaseInfoDto;
 import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import org.junit.jupiter.api.Test;
@@ -28,5 +30,32 @@ public class CourseBaseInfoServiceTests {
         PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
         System.out.println("courseBasePageResult = " + courseBasePageResult);
     }
+
+    @Test
+    void testCreateCourseBase(){
+        Long companyId = 1234L;
+        AddCourseDto addCourseDto = new AddCourseDto();
+        addCourseDto.setName("学成在线项目课程");
+        addCourseDto.setMt("实战项目");
+        addCourseDto.setSt("Java企业级项目");
+        addCourseDto.setPic("afsdfasd");
+        addCourseDto.setTeachmode("200002");
+        addCourseDto.setUsers("中级人员");
+        addCourseDto.setTags("xiangmu");
+        addCourseDto.setGrade("204001");
+        addCourseDto.setCharge("201000");
+        addCourseDto.setPrice(1000F);
+        addCourseDto.setOriginalPrice(899F);
+        addCourseDto.setQq("qq1234");
+        addCourseDto.setWechat("wechat1234");
+        addCourseDto.setPhone("phone1234");
+        addCourseDto.setValidDays(365);
+
+        CourseBaseInfoDto courseBase = courseBaseInfoService.createCourseBase(companyId, addCourseDto);
+
+        System.out.println(courseBase);
+    }
+
+
 
 }
