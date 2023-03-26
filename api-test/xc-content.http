@@ -90,4 +90,4 @@ Content-Type: application/json
 }
 
 ###课程计划查询byCourseId
-GET {{content_host}}/content/teachplan/7/tree-nodes
+GET {{content_host}}/content/teachplan/117/tree-nodes
