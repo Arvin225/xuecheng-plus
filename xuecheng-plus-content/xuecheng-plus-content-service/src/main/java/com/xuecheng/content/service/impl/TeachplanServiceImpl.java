@@ -77,9 +77,9 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
         //无则删除
         int del = teachplanMapper.deleteById(id);
-        if (del < 1) {
+        /*if (del < 1) {
             XueChengPlusException.cast("删除失败");
-        }
+        }*///冗余
 
         //同时删除teachplan_media
         LambdaQueryWrapper<TeachplanMedia> teachplanMediaQueryWrapper = new LambdaQueryWrapper<>();
@@ -90,11 +90,40 @@ public class TeachplanServiceImpl implements TeachplanService {
         if (count2 > 0) {
             int i = teachplanMediaMapper.delete(teachplanMediaQueryWrapper);
             //删除的数目不对，报异常
-            if (i != count2) {
+            if (i != count2) {//todo：是否冗余有待商榷
                 XueChengPlusException.cast("删除失败");
             }
         }
         return del;
+    }
+
+    @Override
+    public Integer deleteByCourseId(Long courseId) {
+        if (courseId == null) {
+            XueChengPlusException.cast("课程id为空");
+        }
+
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getCourseId, courseId);
+
+        int delete = teachplanMapper.delete(queryWrapper);
+        /*if (delete < 1) {
+            XueChengPlusException.cast("该课程的计划删除失败");
+        }*///冗余
+
+        //删除媒资信息，有才删
+        LambdaQueryWrapper<TeachplanMedia> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(TeachplanMedia::getCourseId, courseId);
+
+        List<TeachplanMedia> mediaList = teachplanMediaMapper.selectList(wrapper);
+        if (!mediaList.isEmpty()) {
+            teachplanMediaMapper.delete(wrapper);
+            /*if (i < 1) {
+                XueChengPlusException.cast("删除失败");
+            }*///冗余
+        }
+
+        return delete;
     }
 
     @Override

@@ -14,6 +14,8 @@ import com.xuecheng.content.model.dto.QueryCourseParamsDto;
 import com.xuecheng.content.model.po.CourseBase;
 import com.xuecheng.content.model.po.CourseMarket;
 import com.xuecheng.content.service.CourseBaseInfoService;
+import com.xuecheng.content.service.CourseTeacherService;
+import com.xuecheng.content.service.TeachplanService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,11 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseBaseMapper courseBaseMapper;
     @Autowired
     CourseMarketMapper courseMarketMapper;
+
+    @Autowired
+    CourseTeacherService courseTeacherService;
+    @Autowired
+    TeachplanService teachplanService;
 
     @Override
     public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParams) {
@@ -198,6 +205,40 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         }
 
         return getCourseBaseInfo(editCourseDto.getId());
+    }
+
+    @Override
+    public void deleteById(Long courseId) {
+        /*
+            删除逻辑
+                已提交才能删
+                删
+                    课程师资
+                    课程计划
+                    课程
+         */
+        CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (courseBase == null) {
+            XueChengPlusException.cast("无该课程");
+        }
+        String auditStatus = courseBase.getAuditStatus();
+        if (!StringUtils.equals(auditStatus, "202002")) {
+            XueChengPlusException.cast("课程已提交无法直接删除");
+        }
+
+        //删除课程师资（不管有无直接执行删除操作）
+        courseTeacherService.delete(courseId, null);
+
+        //删除课程计划（不管有无直接执行删除操作）
+        teachplanService.deleteByCourseId(courseId);
+
+        //删除课程
+        //删除课程营销信息（不管有无直接执行删除操作）
+        courseMarketMapper.deleteById(courseId);
+
+        //删除课程基本信息
+        courseBaseMapper.deleteById(courseId);
+
     }
 
     private int saveCourseMarket(CourseMarket courseMarket) {

@@ -43,16 +43,20 @@ public class CourseTeacherServiceImpl implements CourseTeacherService {
     }
 
     @Override
-    public void delete(Long courseId, Long id) {
-        if (courseId == null || id == null) {
-            XueChengPlusException.cast("课程id或教师id不能为空");
+    public Integer delete(Long courseId, Long id) {
+        if (courseId == null) {
+            XueChengPlusException.cast("课程id不能为空");
         }
         LambdaQueryWrapper<CourseTeacher> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(CourseTeacher::getCourseId, courseId)
-                .eq(CourseTeacher::getId, id);
-        int delete = courseTeacherMapper.delete(queryWrapper);
-        if (delete < 1) {
-            XueChengPlusException.cast("删除失败");
+        queryWrapper.eq(CourseTeacher::getCourseId, courseId);
+        if (id != null) {
+            queryWrapper.eq(CourseTeacher::getId, id);
         }
+        int delete = courseTeacherMapper.delete(queryWrapper);
+        /*if (delete < 1) {
+            XueChengPlusException.cast("删除失败");
+        }*/
+
+        return delete;
     }
 }

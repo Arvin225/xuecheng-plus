@@ -25,9 +25,11 @@ public interface CourseTeacherService {
     void saveCourseTeacher(CourseTeacher courseTeacher);
 
     /**
-     * 删除一位教师
-     * @param courseId
-     * @param id
+     * 删除课程教师
+     * @param courseId 课程id
+     * @param id 教师id
+     * @return 删除成功的数目
      */
-    void delete(Long courseId, Long id);
+    @Transactional
+    Integer delete(Long courseId, Long id);
 }

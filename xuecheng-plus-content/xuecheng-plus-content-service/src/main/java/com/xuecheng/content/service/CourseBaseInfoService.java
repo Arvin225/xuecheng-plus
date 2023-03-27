@@ -37,4 +37,10 @@ public interface CourseBaseInfoService {
     @Transactional
     CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
 
+    /**
+     * 删除课程
+     * @param courseId 课程id
+     */
+    @Transactional
+    void deleteById(Long courseId);
 }

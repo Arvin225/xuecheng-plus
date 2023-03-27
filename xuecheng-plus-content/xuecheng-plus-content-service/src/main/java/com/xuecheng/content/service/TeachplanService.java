@@ -22,11 +22,19 @@ public interface TeachplanService {
     void saveTeachplan(TeachplanDto teachplanDto);
 
     /**
-     * 删除课程计划
+     * 删除单个课程计划
      * @param id 课程计划id
      */
     @Transactional
     Integer deleteById(Long id);
+
+    /**
+     * 删除课程的所有计划
+     * @param courseId 课程id
+     * @return 删除成功的数目
+     */
+    @Transactional
+    Integer deleteByCourseId(Long courseId);
 
     /**
      * 课程计划上移/下移展示
