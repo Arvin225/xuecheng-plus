@@ -152,14 +152,14 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
         //判空
         if (courseBase == null) {
-            throw new XueChengPlusException("未查到该课程的基本信息，程序终止。（课程id：" + courseId + "）");
+            throw new XueChengPlusException("未查到该课程的基本信息，程序终止");
         }
 
         //1.2.查询营销信息表
         CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
         //判空
         if (courseMarket == null) {
-            throw new XueChengPlusException("未查到该课程的营销信息，程序终止。（课程id：" + courseId + "）");
+            throw new XueChengPlusException("未查到该课程的营销信息，程序终止");
         }
 
         //2.构造返回数据的模型

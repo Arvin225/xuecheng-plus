@@ -27,4 +27,12 @@ public interface TeachplanService {
      */
     @Transactional
     Integer deleteById(Long id);
+
+    /**
+     * 课程计划上移/下移展示
+     * @param up 是否上移
+     * @param id 课程计划id
+     */
+    @Transactional
+    void move(Boolean up, Long id);
 }

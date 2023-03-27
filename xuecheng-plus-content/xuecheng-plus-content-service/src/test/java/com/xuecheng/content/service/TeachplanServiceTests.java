@@ -20,4 +20,9 @@ public class TeachplanServiceTests {
         Integer delete = teachplanService.deleteById(268L);
         System.out.println(delete);
     }
+
+    @Test
+    void testMove(){
+        teachplanService.move(true, 268L);
+    }
 }

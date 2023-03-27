@@ -97,6 +97,64 @@ public class TeachplanServiceImpl implements TeachplanService {
         return del;
     }
 
+    @Override
+    public void move(Boolean up, Long id) {
+        //查询当前节点
+        Teachplan teachplan = teachplanMapper.selectById(id);
+        if (teachplan == null) {
+            XueChengPlusException.cast("该课程计划不存在");
+        }
+
+        //查询同级别节点同时排序，返回的是list
+        LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Teachplan::getCourseId, teachplan.getCourseId())
+                .eq(Teachplan::getParentid, teachplan.getParentid())
+                .orderByAsc(Teachplan::getOrderby);//这里与查询课程计划树时的排序模式保持一致
+        List<Teachplan> list = teachplanMapper.selectList(queryWrapper);
+
+        //获取当前节点的位置，即索引
+        //int index = list.indexOf(teachplan);
+        //遍历获取
+        int index = -1;//赋初值，也是未找到时的值
+        for (int i = 0; i < list.size(); i++) {
+            if (list.get(i).getId().equals(teachplan.getId())) {
+                index = i;
+                break;
+            }
+        }
+
+        //特殊情况处理
+        //若是第一个，则无法上移
+        if (index == 0 && up) {
+            XueChengPlusException.cast("已是最上层，无法继续上移");
+        }
+        //若是最后一个，则无法下移
+        if (index == list.size() - 1 && !up) {
+            XueChengPlusException.cast("已是最底层，无法继续下移");
+        }
+
+        //一般情况
+        //取出上一个或下一个节点，并将其orderBy取出
+        Teachplan lastOrNextNode = list.get(up ? index - 1 : index + 1);
+        Integer nodeOrderby = lastOrNextNode.getOrderby();
+        //获取当前节点的orderBy
+        Integer orderby = teachplan.getOrderby();
+        //交换
+        teachplan.setOrderby(nodeOrderby);
+        lastOrNextNode.setOrderby(orderby);
+        //更新进数据表
+        int update1 = teachplanMapper.updateById(teachplan);
+        if (update1 < 1) {
+            XueChengPlusException.cast(up ? "上移失败" : "下移失败");
+        }
+        int update2 = teachplanMapper.updateById(lastOrNextNode);
+        if (update2 < 1) {
+            XueChengPlusException.cast(up ? "上移失败" : "下移失败");
+        }
+
+
+    }
+
     private int getTeachplanCount(Long courseId, Long parentid) {
         LambdaQueryWrapper<Teachplan> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Teachplan::getCourseId, courseId);
