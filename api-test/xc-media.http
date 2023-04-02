@@ -1,0 +1,9 @@
+### 上传文件
+POST {{media_host}}/media/upload/coursefile
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="filedata"; filename="Snipaste_2023-03-31_23-14-57.jpg"
+Content-Type: application/octet-stream
+
+< C:\Users\Arvin\Desktop\Snipaste_2023-03-31_23-14-57.jpg
