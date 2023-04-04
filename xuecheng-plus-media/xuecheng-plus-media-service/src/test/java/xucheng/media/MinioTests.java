@@ -1,12 +1,13 @@
 package xucheng.media;
 
 import com.j256.simplemagic.ContentInfoUtil;
-import io.minio.DownloadObjectArgs;
-import io.minio.MinioClient;
-import io.minio.RemoveObjectArgs;
-import io.minio.UploadObjectArgs;
+import io.minio.*;
+import io.minio.messages.Tags;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import java.io.InputStream;
+import java.util.Map;
 
 @SpringBootTest
 public class MinioTests {
@@ -20,12 +21,12 @@ public class MinioTests {
     String mimeType = ContentInfoUtil.findExtensionMatch(".txt").getMimeType();
 
     @Test
-    void testUpload(){
+    void testUpload() {
         try {
             minioClient.uploadObject(
                     UploadObjectArgs
                             .builder()
-                            .bucket("mediafiles")
+                            .bucket("video")
                             .object("/test/001.txt")
                             .filename("C:\\Users\\Arvin\\Desktop\\.txt")
                             .contentType(mimeType)
@@ -37,23 +38,27 @@ public class MinioTests {
     }
 
     @Test
-    void testDownload(){
+    void testGetObj() {
         try {
-            minioClient.downloadObject(
-                    DownloadObjectArgs
+            InputStream object = minioClient.getObject(
+                    GetObjectArgs
                             .builder()
-                            .bucket("mediafiles")
-                            .object(".txt")
-                            .filename("C:\\Users\\Arvin\\Desktop\\download.txt")
+                            .bucket("video")
+                            .object("test/001.txt")
                             .build());
-            System.err.println("下载成功");
+
+            if (object != null) {
+                System.err.println("下载成功：" + object);
+            }else {
+                System.out.println("下载失败");
+            }
         } catch (Exception e) {
-            System.out.println("下载失败");
+            System.err.println("异常");
         }
     }
 
     @Test
-    void testRemove(){
+    void testRemove() {
         try {
             minioClient.removeObject(
                     RemoveObjectArgs
@@ -65,6 +70,21 @@ public class MinioTests {
             System.out.println("删除成功");
         } catch (Exception e) {
             System.out.println("删除失败");
+        }
+    }
+
+    @Test
+    void testGetObjTags() {
+        GetObjectTagsArgs getObjectTagsArgs = GetObjectTagsArgs.builder()
+                .bucket("mediafiles")
+                .object("2023/04/01/pexels-pixabay-35857.jpg")
+                .build();
+        try {
+            Tags tags = minioClient.getObjectTags(getObjectTagsArgs);
+            Map<String, String> map = tags.get();
+            System.out.println(map);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 }
