@@ -9,6 +9,8 @@ import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
+
 /**
  * @author Mr.M
  * @version 1.0
@@ -87,6 +89,26 @@ public interface MediaFileService {
      * @return 状态与信息
      */
     RestResponse mergeChunks(Long companyId,String fileMd5,int chunkTotal,UploadFileParamsDto uploadFileParamsDto);
+
+    /**
+     * 从minio下载文件
+     *
+     * @param bucket     桶
+     * @param objectName 对象名称
+     * @return 下载后的文件
+     */
+    File downloadFileFromMinIO(String bucket, String objectName);
+
+    /**
+     * @param localFilePath 文件地址
+     * @param bucket        桶
+     * @param objectName    对象名称
+     * @return void
+     * @description 将文件写入minIO
+     * @author Mr.M
+     * @date 2022/10/12 21:22
+     */
+    boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
 
 
 }

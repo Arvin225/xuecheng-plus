@@ -9,10 +9,12 @@ import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.base.model.RestResponse;
 import com.xuecheng.media.mapper.MediaFilesMapper;
+import com.xuecheng.media.mapper.MediaProcessMapper;
 import com.xuecheng.media.model.dto.QueryMediaParamsDto;
 import com.xuecheng.media.model.dto.UploadFileParamsDto;
 import com.xuecheng.media.model.dto.UploadFileResultDto;
 import com.xuecheng.media.model.po.MediaFiles;
+import com.xuecheng.media.model.po.MediaProcess;
 import com.xuecheng.media.service.MediaFileService;
 import io.minio.*;
 import io.minio.messages.DeleteError;
@@ -51,6 +53,9 @@ public class MediaFileServiceImpl implements MediaFileService {
 
     @Autowired
     MediaFilesMapper mediaFilesMapper;
+
+    @Autowired
+    MediaProcessMapper mediaProcessMapper;
 
     //普通文件桶
     @Value("${minio.bucket.files}")
@@ -174,15 +179,6 @@ public class MediaFileServiceImpl implements MediaFileService {
         return mimeType;
     }
 
-    /**
-     * @param localFilePath 文件地址
-     * @param bucket        桶
-     * @param objectName    对象名称
-     * @return void
-     * @description 将文件写入minIO
-     * @author Mr.M
-     * @date 2022/10/12 21:22
-     */
     public boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName) {
         try {
             minioClient.uploadObject(
@@ -237,11 +233,30 @@ public class MediaFileServiceImpl implements MediaFileService {
                 log.error("保存文件信息到数据库失败,{}", mediaFiles);
                 XueChengPlusException.cast("保存文件信息失败");
             }
-            log.debug("保存文件信息到数据库成功,{}", mediaFiles);
 
+            //将文件信息添加到待处理任务表
+            addWaitingTask(mediaFiles);
+
+            log.debug("保存文件信息到数据库成功,{}", mediaFiles);
         }
         return mediaFiles;
 
+    }
+
+    private void addWaitingTask(MediaFiles mediaFiles) {
+        //判断是否需要将当前上传的视频转成MP4格式，这里暂时只对avi做转码
+        //通过mimeType判断
+        String filename = mediaFiles.getFilename();
+        String extension = filename.substring(filename.lastIndexOf("."));
+        String mimeType = getMimeType(extension);
+        //需要则将信息记录到待处理数据表
+        if (StringUtils.equals(mimeType, "video/x-msvideo")) {
+            MediaProcess mediaProcess = new MediaProcess();
+            BeanUtils.copyProperties(mediaFiles, mediaProcess);
+            mediaProcess.setStatus("1");//未处理
+            mediaProcess.setFailCount(0);//失败次数默认为0
+            mediaProcessMapper.insert(mediaProcess);
+        }
     }
 
     @Override
@@ -408,13 +423,6 @@ public class MediaFileServiceImpl implements MediaFileService {
         return fileMd5.substring(0, 1) + "/" + fileMd5.substring(1, 2) + "/" + fileMd5 + "/" + fileMd5 + fileExt;
     }
 
-    /**
-     * 从minio下载文件
-     *
-     * @param bucket     桶
-     * @param objectName 对象名称
-     * @return 下载后的文件
-     */
     public File downloadFileFromMinIO(String bucket, String objectName) {
         //临时文件
         File minioFile;
