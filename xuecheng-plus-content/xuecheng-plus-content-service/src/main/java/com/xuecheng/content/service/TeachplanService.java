@@ -1,6 +1,8 @@
 package com.xuecheng.content.service;
 
+import com.xuecheng.content.model.dto.BindTeachplanMediaDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
+import com.xuecheng.content.model.po.TeachplanMedia;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -43,4 +45,21 @@ public interface TeachplanService {
      */
     @Transactional
     void move(Boolean up, Long id);
+
+    /**
+     * 绑定媒资（操作课程计划-媒资关系表）
+     *
+     * @param bindTeachplanMediaDto 参数
+     * @return 课程计划的媒资信息
+     */
+    @Transactional
+    TeachplanMedia bindMedia(BindTeachplanMediaDto bindTeachplanMediaDto);
+
+    /**
+     * 删除媒资
+     * @param teachplanId 课程计划id
+     * @param mediaId 媒资id
+     */
+    @Transactional
+    void deleteMedia(Long teachplanId, String mediaId);
 }

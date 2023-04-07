@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.content.mapper.TeachplanMapper;
 import com.xuecheng.content.mapper.TeachplanMediaMapper;
+import com.xuecheng.content.model.dto.BindTeachplanMediaDto;
 import com.xuecheng.content.model.dto.TeachplanDto;
 import com.xuecheng.content.model.po.Teachplan;
 import com.xuecheng.content.model.po.TeachplanMedia;
@@ -182,6 +183,53 @@ public class TeachplanServiceImpl implements TeachplanService {
         }
 
 
+    }
+
+    @Override
+    public TeachplanMedia bindMedia(BindTeachplanMediaDto bindTeachplanMediaDto) {
+
+        //获取课程计划id
+        Long teachplanId = bindTeachplanMediaDto.getTeachplanId();
+        if (teachplanId == null) {
+            XueChengPlusException.cast("课程计划id为空");
+        }
+        //获取课程计划
+        Teachplan teachplan = teachplanMapper.selectById(teachplanId);//查询课程计划获取课程id
+        if (teachplan == null) {
+            XueChengPlusException.cast("无该课程计划");
+        }
+        Integer grade = teachplan.getGrade();
+        if (grade == 1) {
+            XueChengPlusException.cast("只允许二级课程计划绑定媒资");
+        }
+
+        //删除当前课程计划已有的媒资
+        teachplanMediaMapper.delete(new LambdaQueryWrapper<TeachplanMedia>()
+                .eq(TeachplanMedia::getTeachplanId, teachplanId));
+
+        //插入传入的媒资信息
+        //封装
+        TeachplanMedia teachplanMedia = new TeachplanMedia();
+        teachplanMedia.setTeachplanId(teachplanId);
+        teachplanMedia.setMediaFilename(bindTeachplanMediaDto.getFileName());
+        teachplanMedia.setMediaId(bindTeachplanMediaDto.getMediaId());
+        teachplanMedia.setCourseId(teachplan.getCourseId());
+
+        //插入
+        teachplanMediaMapper.insert(teachplanMedia);
+
+        return teachplanMedia;
+    }
+
+    @Override
+    public void deleteMedia(Long teachplanId, String mediaId) {
+        if (teachplanId == null || mediaId == null) {
+            XueChengPlusException.cast("课程计划id或媒资id为空");
+        }
+        LambdaQueryWrapper<TeachplanMedia> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(TeachplanMedia::getTeachplanId, teachplanId)
+                .eq(TeachplanMedia::getMediaId, mediaId);
+        teachplanMediaMapper.delete(queryWrapper);
     }
 
     private int getTeachplanCount(Long courseId, Long parentid) {
