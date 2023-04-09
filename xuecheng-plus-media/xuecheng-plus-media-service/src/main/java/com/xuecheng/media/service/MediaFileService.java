@@ -27,7 +27,7 @@ public interface MediaFileService {
      * @author Mr.M
      * @date 2022/9/10 8:57
      */
-    PageResult<MediaFiles> queryMediaFiels(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto);
+    PageResult<MediaFiles> queryMediaFiles(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto);
 
     /**
      * 上传文件
@@ -109,6 +109,13 @@ public interface MediaFileService {
      * @date 2022/10/12 21:22
      */
     boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucket, String objectName);
+
+    /**
+     * 根据id获取媒资信息
+     * @param mediaId id
+     * @return 媒资信息
+     */
+    MediaFiles getMediaFilesById(String mediaId);
 
 
 }

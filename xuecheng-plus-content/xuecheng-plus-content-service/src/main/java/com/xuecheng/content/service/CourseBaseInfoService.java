@@ -34,6 +34,12 @@ public interface CourseBaseInfoService {
      */
     CourseBaseInfoDto getCourseBaseInfo(Long courseId);
 
+    /**
+     * 更新课程信息
+     * @param companyId 机构id
+     * @param editCourseDto 编辑的课程信息
+     * @return 课程基本信息
+     */
     @Transactional
     CourseBaseInfoDto updateCourseBase(Long companyId, EditCourseDto editCourseDto);
 

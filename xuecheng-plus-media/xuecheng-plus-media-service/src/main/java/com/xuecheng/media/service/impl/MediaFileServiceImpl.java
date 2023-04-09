@@ -70,7 +70,7 @@ public class MediaFileServiceImpl implements MediaFileService {
 
 
     @Override
-    public PageResult<MediaFiles> queryMediaFiels(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto) {
+    public PageResult<MediaFiles> queryMediaFiles(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto) {
 
         //构建查询条件对象
         LambdaQueryWrapper<MediaFiles> queryWrapper = new LambdaQueryWrapper<>();
@@ -197,6 +197,11 @@ public class MediaFileServiceImpl implements MediaFileService {
             XueChengPlusException.cast("上传文件到文件系统失败");
         }
         return false;
+    }
+
+    @Override
+    public MediaFiles getMediaFilesById(String mediaId) {
+        return mediaFilesMapper.selectById(mediaId);
     }
 
     /**

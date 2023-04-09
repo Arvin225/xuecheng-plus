@@ -154,6 +154,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
             throw new XueChengPlusException("课程id为空，无法继续操作");
         }
 
+        //创建数据模型
+        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
+
         //1.查询基本信息表、营销信息表
         //1.1.查询基本信息表
         CourseBase courseBase = courseBaseMapper.selectById(courseId);
@@ -161,19 +164,19 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         if (courseBase == null) {
             throw new XueChengPlusException("未查到该课程的基本信息，程序终止");
         }
+        //拷贝基本信息到数据模型
+        BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
 
         //1.2.查询营销信息表
         CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
         //判空
-        if (courseMarket == null) {
-            throw new XueChengPlusException("未查到该课程的营销信息，程序终止");
+        if (courseMarket != null) {
+            //throw new XueChengPlusException("未查到该课程的营销信息，程序终止");
+            //拷贝营销信息到数据模型
+            BeanUtils.copyProperties(courseMarket, courseBaseInfoDto);
         }
 
-        //2.构造返回数据的模型
-        CourseBaseInfoDto courseBaseInfoDto = new CourseBaseInfoDto();
-        //拷贝基本信息、营销信息到数据模型
-        BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
-        BeanUtils.copyProperties(courseMarket, courseBaseInfoDto);
+        //2.构造返回数据模型
         return courseBaseInfoDto;
     }
 
