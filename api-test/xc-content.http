@@ -91,3 +91,6 @@ Content-Type: application/json
 
 ###课程计划查询byCourseId
 GET {{gateway_host}}/content/teachplan/117/tree-nodes
+
+###
+POST {{gateway_host}}/content/courseaudit/commit/1

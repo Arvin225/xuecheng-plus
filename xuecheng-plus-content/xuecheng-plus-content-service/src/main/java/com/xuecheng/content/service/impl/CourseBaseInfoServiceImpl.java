@@ -6,6 +6,7 @@ import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageParams;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.mapper.CourseBaseMapper;
+import com.xuecheng.content.mapper.CourseCategoryMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.model.dto.AddCourseDto;
 import com.xuecheng.content.model.dto.CourseBaseInfoDto;
@@ -30,6 +31,8 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     CourseBaseMapper courseBaseMapper;
     @Autowired
     CourseMarketMapper courseMarketMapper;
+    @Autowired
+    CourseCategoryMapper courseCategoryMapper;
 
     @Autowired
     CourseTeacherService courseTeacherService;
@@ -166,6 +169,12 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         }
         //拷贝基本信息到数据模型
         BeanUtils.copyProperties(courseBase, courseBaseInfoDto);
+
+        //查询分类表，得到分类名，封装 todo：建议添加判空逻辑
+        String mtName = courseCategoryMapper.selectById(courseBase.getMt()).getName();//大分类名
+        String stName = courseCategoryMapper.selectById(courseBase.getSt()).getName();//小分类名
+        courseBaseInfoDto.setMtName(mtName);
+        courseBaseInfoDto.setStName(stName);
 
         //1.2.查询营销信息表
         CourseMarket courseMarket = courseMarketMapper.selectById(courseId);
