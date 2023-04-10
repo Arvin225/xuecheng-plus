@@ -1,6 +1,7 @@
 package com.xuecheng.content.service;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface CoursePublishService {
 
@@ -18,6 +19,19 @@ public interface CoursePublishService {
      * @author Mr.M
      * @date 2022/9/18 10:31
      */
+    @Transactional
     public void commitAudit(Long companyId,Long courseId);
+
+    /**
+     * @description 课程发布接口
+     * @param companyId 机构id
+     * @param courseId 课程id
+     * @return void
+     * @author Mr.M
+     * @date 2022/9/20 16:23
+     */
+    @Transactional
+    public void publish(Long companyId,Long courseId);
+
 
 }

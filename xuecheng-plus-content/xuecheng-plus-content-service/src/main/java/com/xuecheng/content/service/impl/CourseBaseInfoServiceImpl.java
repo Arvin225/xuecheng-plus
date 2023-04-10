@@ -200,6 +200,8 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         //更新course_base表
         BeanUtils.copyProperties(editCourseDto, courseBase);
         courseBase.setCompanyId(companyId);
+        courseBase.setAuditStatus("202002");//审核状态：未提交
+        courseBase.setStatus("203001");//发布状态：未发布
 
         int i1 = courseBaseMapper.updateById(courseBase);
         if (i1 <= 0) {
