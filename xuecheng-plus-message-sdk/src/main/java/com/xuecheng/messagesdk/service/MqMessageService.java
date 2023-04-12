@@ -24,7 +24,7 @@ public interface MqMessageService extends IService<MqMessage> {
      * @author Mr.M
      * @date 2022/9/21 18:55
      */
-    public List<MqMessage> getMessageList(int shardIndex, int shardTotal,  String messageType,int count);
+    List<MqMessage> getMessageList(int shardIndex, int shardTotal,  String messageType,int count);
 
     /**
      * @description 添加消息
@@ -35,7 +35,7 @@ public interface MqMessageService extends IService<MqMessage> {
      * @author Mr.M
      * @date 2022/9/23 13:45
     */
-    public MqMessage addMessage(String messageType,String businessKey1,String businessKey2,String businessKey3);
+    MqMessage addMessage(String messageType,String businessKey1,String businessKey2,String businessKey3);
     /**
      * @description 完成任务
      * @param id 消息id
@@ -43,7 +43,7 @@ public interface MqMessageService extends IService<MqMessage> {
      * @author Mr.M
      * @date 2022/9/21 20:49
      */
-    public int completed(long id);
+    int completed(long id);
 
     /**
      * @description 完成阶段任务
@@ -52,10 +52,10 @@ public interface MqMessageService extends IService<MqMessage> {
      * @author Mr.M
      * @date 2022/9/21 20:49
      */
-    public int completedStageOne(long id);
-    public int completedStageTwo(long id);
-    public int completedStageThree(long id);
-    public int completedStageFour(long id);
+    int completedStageOne(long id);
+    int completedStageTwo(long id);
+    int completedStageThree(long id);
+    int completedStageFour(long id);
 
     /**
      * @description 查询阶段状态
@@ -64,9 +64,9 @@ public interface MqMessageService extends IService<MqMessage> {
      * @author Mr.M
      * @date 2022/9/21 20:54
     */
-    public int getStageOne(long id);
-    public int getStageTwo(long id);
-    public int getStageThree(long id);
-    public int getStageFour(long id);
+    int getStageOne(long id);
+    int getStageTwo(long id);
+    int getStageThree(long id);
+    int getStageFour(long id);
 
 }

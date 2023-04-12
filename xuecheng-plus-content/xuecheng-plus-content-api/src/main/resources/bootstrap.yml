@@ -32,6 +32,10 @@ spring:
           - data-id: freemarker-config-${spring.profiles.active}.yaml #引入模板引擎freemarker的配置
             group: xuecheng-plus-common
             refresh: true
+          - data-id: feign-${spring.profiles.active}.yaml
+            group: xuecheng-plus-common
+            refresh: true
+
   profiles: #profiles默认为dev
     active: dev
 

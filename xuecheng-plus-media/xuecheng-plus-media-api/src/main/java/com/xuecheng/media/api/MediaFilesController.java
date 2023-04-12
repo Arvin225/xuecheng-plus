@@ -42,7 +42,7 @@ public class MediaFilesController {
 
     @ApiOperation("课程媒体资源上传")
     @PostMapping(value = "/upload/coursefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UploadFileResultDto update(@RequestPart("filedata") MultipartFile fileToUpload,
+    public UploadFileResultDto upload(@RequestPart("filedata") MultipartFile fileToUpload,
                                       @RequestParam(value = "folder",required=false) String folder,
                                       @RequestParam(value = "objectName",required=false) String objectName) throws IOException {
         //todo:机构id
@@ -64,7 +64,7 @@ public class MediaFilesController {
         //获取文件路径
         String localFilePath = tempFile.getAbsolutePath();
 
-        return mediaFileService.uploadFile(companyId, uploadFileParamsDto, localFilePath);
+        return mediaFileService.uploadFile(companyId, uploadFileParamsDto, localFilePath, objectName);
     }
 
 

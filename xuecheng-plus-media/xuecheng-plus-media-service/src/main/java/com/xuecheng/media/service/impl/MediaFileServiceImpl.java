@@ -90,7 +90,7 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
 
     @Override
-    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath) {
+    public UploadFileResultDto uploadFile(Long companyId, UploadFileParamsDto uploadFileParamsDto, String localFilePath, String objectName) {
 
         File file = new File(localFilePath);
         if (!file.exists()) {
@@ -102,14 +102,15 @@ public class MediaFileServiceImpl implements MediaFileService {
         //获取文件扩展名
         String extension = filename.substring(filename.lastIndexOf("."));
 
-        //获取根据日期生成的路径作为上传文件的路径
-        String folderPath = getDefaultFolderPath();
-
         //获取文件的mimeType类型
         String mimeType = getMimeType(extension);
         //拼接文件上传后在minio上的对象名
         //String objectName = folderPath + filename + extension;
-        String objectName = folderPath + filename;
+        if (StringUtils.isEmpty(objectName)) {
+            //获取根据日期生成的路径作为上传文件的路径
+            String folderPath = getDefaultFolderPath();
+            objectName = folderPath + filename;
+        }
 
         //上传到minio
         boolean addToMinIO = addMediaFilesToMinIO(localFilePath, mimeType, bucket_files, objectName);

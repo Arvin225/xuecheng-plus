@@ -3,6 +3,8 @@ package com.xuecheng.content.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.xuecheng.base.exception.CommonError;
 import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.config.MultipartSupportConfig;
+import com.xuecheng.content.feignclient.MediaServiceClient;
 import com.xuecheng.content.mapper.CourseBaseMapper;
 import com.xuecheng.content.mapper.CourseMarketMapper;
 import com.xuecheng.content.mapper.CoursePublishMapper;
@@ -19,14 +21,26 @@ import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.content.service.TeachplanService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MqMessageService;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @Service
 public class CoursePublishServiceImpl implements CoursePublishService {
 
@@ -46,10 +60,16 @@ public class CoursePublishServiceImpl implements CoursePublishService {
     CoursePublishPreMapper coursePublishPreMapper;
 
     @Autowired
+    CoursePublishService coursePublishService;
+
+    @Autowired
     CoursePublishMapper coursePublishMapper;
 
     @Autowired
     MqMessageService mqMessageService;
+
+    @Autowired
+    MediaServiceClient mediaServiceClient;
 
     @Override
     public CoursePreviewDto getCoursePreviewInfo(Long courseId) {
@@ -130,7 +150,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         CoursePublishPre coursePublishPreBySelect = coursePublishPreMapper.selectById(courseId);
         if (coursePublishPreBySelect != null) {
             coursePublishPreMapper.updateById(coursePublishPre);
-        }else {
+        } else {
             coursePublishPreMapper.insert(coursePublishPre);
         }
 
@@ -163,7 +183,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         CoursePublish coursePublishBySelect = coursePublishMapper.selectById(courseId);
         if (coursePublishBySelect != null) {
             coursePublishMapper.updateById(coursePublish);
-        }else {
+        } else {
             coursePublishMapper.insert(coursePublish);
         }
         //更新课程基本信息状态为已发布
@@ -179,6 +199,68 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
         //删除预发布表中数据
         coursePublishPreMapper.deleteById(courseId);
+    }
+
+    @Override
+    public File generateCourseHtml(Long courseId) {
+
+        //声明临时文件
+        File htmlFile = null;
+        //配置freemarker
+        Configuration configuration = new Configuration(Configuration.getVersion());
+        try {
+            //加载模板
+            //选指定模板路径,classpath下templates下
+            //得到classpath路径
+            String classpath = this.getClass().getResource("/").getPath();
+
+            configuration.setDirectoryForTemplateLoading(new File(classpath + "/templates/"));
+
+            //设置字符编码
+            configuration.setDefaultEncoding("utf-8");
+
+            //指定模板文件名称
+            Template template = configuration.getTemplate("course_template.ftl");
+
+
+            //模型
+            CoursePreviewDto coursePreviewInfo = coursePublishService.getCoursePreviewInfo(courseId);
+            /*if (coursePublish == null) {
+                XueChengPlusException.cast("课程未发布");
+            }*/
+            Map<String, CoursePreviewDto> model = new HashMap<>();
+            model.put("model", coursePreviewInfo);
+
+
+            //生成静态页面，但字符串呈现
+            String intoString = FreeMarkerTemplateUtils.processTemplateIntoString(template, model);
+            //将其写出到本地临时文件
+            //创建一个空的本地临时文件
+            htmlFile = File.createTempFile("course", ".html");
+            //通过流
+            FileOutputStream outputStream = new FileOutputStream(htmlFile);//输出流
+            InputStream inputStream = IOUtils.toInputStream(intoString);//输入流
+            //将生成的静态html内容以流的形式写出到本地临时文件
+            IOUtils.copy(inputStream, outputStream);
+        } catch (Exception e) {
+            log.error("课程静态化异常:{}", e.toString());
+            XueChengPlusException.cast("课程静态化异常");
+        }
+
+        return htmlFile;
+    }
+
+    @Override
+    public void uploadCourseHtml(Long courseId, File file) {
+
+        MultipartFile fileToUpload = MultipartSupportConfig.getMultipartFile(file);
+        String objectName = "course/" + courseId + ".html";
+
+        String course = mediaServiceClient.upload(fileToUpload, null, objectName);
+        if (StringUtils.isEmpty(course)) {
+            XueChengPlusException.cast("上传静态文件异常");
+        }
+
     }
 
     /**
