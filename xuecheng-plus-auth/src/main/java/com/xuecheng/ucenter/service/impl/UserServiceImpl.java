@@ -40,7 +40,7 @@ public class UserServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        AuthParamsDto authParamsDto = null;
+        AuthParamsDto authParamsDto;
         try {
             //将接收到的认证参数转化为AuthParamsDto对象
             authParamsDto = JSON.parseObject(s, AuthParamsDto.class);
