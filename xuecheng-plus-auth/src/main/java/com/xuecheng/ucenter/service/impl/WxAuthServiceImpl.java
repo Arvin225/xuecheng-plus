@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -43,6 +44,9 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
 
     @Autowired
     XcUserRoleMapper xcUserRoleMapper;
+
+    @Autowired
+    WxAuthServiceImpl currentProxy;
 
     @Override
     public XcUserExt execute(AuthParamsDto authParamsDto) {
@@ -78,7 +82,7 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
         }
 
         //3.保存用户信息到数据库，并返回
-        return addWxUser(userinfo);
+        return currentProxy.addWxUser(userinfo);
     }
 
     /**
@@ -159,7 +163,8 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
         return userinfo;
     }
 
-    private XcUser addWxUser(Map<String, String> userinfo) {
+    @Transactional
+    public XcUser addWxUser(Map<String, String> userinfo) {
         //数据库根据unionid查询该用户
         String unionid = userinfo.get("unionid");
         XcUser xcUser = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getWxUnionid, unionid));
