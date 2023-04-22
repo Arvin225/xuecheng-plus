@@ -11,7 +11,7 @@ public class IPUtil {
         String ip = request.getHeader("x-forwarded-for");
         if (ip != null && ip.length() != 0 && !"unknown".equalsIgnoreCase(ip)) {
             // 多次反向代理后会有多个ip值，第一个ip才是真实ip
-            if( ip.indexOf(",")!=-1 ){
+            if (ip.indexOf(",") != -1) {
                 ip = ip.split(",")[0];
             }
         }
@@ -32,7 +32,7 @@ public class IPUtil {
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getRemoteAddr();
-            if (ip.equals("127.0.0.1")  || ip.endsWith("0:0:0:0:0:0:1")) {
+            if (ip.equals("127.0.0.1") || ip.endsWith("0:0:0:0:0:0:1")) {
                 // 根据网卡取本机配置的IP
                 InetAddress inet = null;
                 try {
@@ -45,7 +45,6 @@ public class IPUtil {
         }
         return ip;
     }
-
 
 
 }

@@ -1,6 +1,7 @@
 package com.xuecheng.content.service;
 
 import com.xuecheng.content.model.dto.CoursePreviewDto;
+import com.xuecheng.content.model.po.CoursePublish;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
@@ -55,4 +56,17 @@ public interface CoursePublishService {
     void uploadCourseHtml(Long courseId, File file);
 
 
+    /**
+     * 课程下架
+     * @param courseId 课程id
+     */
+    @Transactional
+    void offline(Long courseId);
+
+    /**
+     * 发布课程查询
+     * @param courseId 课程id
+     * @return 发布的课程
+     */
+    CoursePublish getCoursePublish(Long courseId);
 }

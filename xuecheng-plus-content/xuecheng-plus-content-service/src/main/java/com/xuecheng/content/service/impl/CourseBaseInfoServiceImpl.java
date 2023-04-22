@@ -40,7 +40,7 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
     TeachplanService teachplanService;
 
     @Override
-    public PageResult<CourseBase> queryCourseBaseList(PageParams pageParams, QueryCourseParamsDto queryCourseParams) {
+    public PageResult<CourseBase> queryCourseBaseList(Long companyId, PageParams pageParams, QueryCourseParamsDto queryCourseParams) {
 
         //查询条件构造
         LambdaQueryWrapper<CourseBase> queryWrapper = new LambdaQueryWrapper<>();
@@ -54,7 +54,9 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
                 //根据发布状态
                 .eq(StringUtils.isNotEmpty(queryCourseParams.getPublishStatus())
                         , CourseBase::getStatus
-                        , queryCourseParams.getPublishStatus());
+                        , queryCourseParams.getPublishStatus())
+                //根据机构id，此项非空
+                .eq(CourseBase::getCompanyId, companyId);
 
         //分页查询
         Page<CourseBase> pageInfo = new Page<>(pageParams.getPageNo(), pageParams.getPageSize());
@@ -195,6 +197,10 @@ public class CourseBaseInfoServiceImpl implements CourseBaseInfoService {
         CourseBase courseBase = courseBaseMapper.selectById(editCourseDto.getId());
         if (courseBase == null) {
             XueChengPlusException.cast("未找到到该课程，您可去添加");
+        }
+        //确保修改的是本机构的课程
+        if (!courseBase.getCompanyId().equals(companyId)) {
+            XueChengPlusException.cast("只可修改本机构课程");
         }
 
         //更新course_base表

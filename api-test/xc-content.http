@@ -99,3 +99,7 @@ GET {{gateway_host}}/content/teachplan/117/tree-nodes
 
 ###
 POST {{gateway_host}}/content/courseaudit/commit/1
+
+### 查询课程发布信息
+GET {{content_host}}/content/r/coursepublish/2
+

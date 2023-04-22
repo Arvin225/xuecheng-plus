@@ -27,8 +27,10 @@ public class CourseBaseInfoServiceTests {
         queryCourseParamsDto.setAuditStatus("202004");
         queryCourseParamsDto.setPublishStatus("203002");
 
+        Long companyId = Long.valueOf("1232141425");
+
         //查询
-        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
+        PageResult<CourseBase> courseBasePageResult = courseBaseInfoService.queryCourseBaseList(companyId, pageParams, queryCourseParamsDto);
         System.out.println("courseBasePageResult = " + courseBasePageResult);
     }
 

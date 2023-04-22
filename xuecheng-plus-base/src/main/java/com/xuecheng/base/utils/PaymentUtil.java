@@ -8,10 +8,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 public class PaymentUtil {
-    private static final Pattern pattern = Pattern.compile("SJPAY(,\\S+){4}");
     public static final String SHANJUPAY_PREFIX = "XC";
+    private static final Pattern pattern = Pattern.compile("SJPAY(,\\S+){4}");
 
-    public static boolean checkPayOrderAttach (String attach) {
+    public static boolean checkPayOrderAttach(String attach) {
         if (StringUtils.isBlank(attach)) {
             return false;
         }

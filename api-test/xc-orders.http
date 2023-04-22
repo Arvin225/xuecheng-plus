@@ -1,0 +1,2 @@
+### 查询支付结果
+GET {{orders_host}}/orders/payresult?payNo=1649414327792025600

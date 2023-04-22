@@ -263,6 +263,46 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     }
 
+    @Override
+    public void offline(Long courseId) {
+        //修改基本信息表，发布状态改为已下架
+        /*CourseBase courseBase = courseBaseMapper.selectById(courseId);
+        if (courseBase == null) {
+            log.debug("下架失败，课程信息表无该课程，课程id：{}", courseId);
+            XueChengPlusException.cast("异常，下架失败");
+        }
+        courseBase.setStatus("203003");
+        int i = courseBaseMapper.updateById(courseBase);
+        if (i < 1) {
+            log.debug("下架失败，更新课程基本信息表失败，课程id：{}", courseId);
+            XueChengPlusException.cast("异常，下架失败");
+        }
+
+
+        //修改课程发布表，发布状态改为已下架
+        CoursePublish coursePublish = coursePublishMapper.selectById(courseId);
+        if (coursePublish == null) {
+            log.debug("下架失败，课程未发布，课程id：{}", courseId);
+            XueChengPlusException.cast("异常，下架失败");
+        }
+        coursePublish.setStatus("203003");
+        int i1 = coursePublishMapper.updateById(coursePublish);
+        if (i1 < 1) {
+            log.debug("下架失败，更新课程发布表失败，课程id：{}", courseId);
+            XueChengPlusException.cast("异常，下架失败");
+        }*/
+
+        //to-do:删除索引库中数据
+
+        //to-do:删除minio中发布时生成的静态页面（不删也行，但会占用磁盘空间）
+    }
+
+    @Override
+    public CoursePublish getCoursePublish(Long courseId) {
+        return coursePublishMapper.selectById(courseId);
+
+    }
+
     /**
      * @param courseId 课程id
      * @return void

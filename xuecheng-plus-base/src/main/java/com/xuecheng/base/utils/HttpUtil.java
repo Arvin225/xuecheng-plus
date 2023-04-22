@@ -24,7 +24,7 @@ public class HttpUtil {
         JSON.writeJSONString(response.getOutputStream(), restResponse);
     }
 
-    public static String getAccessToken(String ak,String sk) throws  Exception {
+    public static String getAccessToken(String ak, String sk) throws Exception {
         // 获取token地址
         String authHost = "https://aip.baidubce.com/oauth/2.0/token?";
         String getAccessTokenUrl = authHost
@@ -34,31 +34,31 @@ public class HttpUtil {
                 + "&client_id=" + ak
                 // 3. 官网获取的 Secret Key
                 + "&client_secret=" + sk;
-            URL realUrl = new URL(getAccessTokenUrl);
-            // 打开和URL之间的连接
-            HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
-            connection.setRequestMethod("GET");
-            connection.connect();
-            // 获取所有响应头字段
+        URL realUrl = new URL(getAccessTokenUrl);
+        // 打开和URL之间的连接
+        HttpURLConnection connection = (HttpURLConnection) realUrl.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        // 获取所有响应头字段
             /*Map<String, List<String>> map = connection.getHeaderFields();
             // 遍历所有的响应头字段
             for (String key : map.keySet()) {
                 System.err.println(key + "--->" + map.get(key));
             }*/
-            // 定义 BufferedReader输入流来读取URL的响应
-            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String result = "";
-            String line;
-            while ((line = in.readLine()) != null) {
-                result += line;
-            }
-            in.close();
-            connection.disconnect();
-            /**
-             * 返回结果
-             */
-            Map<String,Object> resultMap= JsonUtil.jsonToMap(result);
-            return resultMap.get("access_token").toString();
+        // 定义 BufferedReader输入流来读取URL的响应
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String result = "";
+        String line;
+        while ((line = in.readLine()) != null) {
+            result += line;
+        }
+        in.close();
+        connection.disconnect();
+        /**
+         * 返回结果
+         */
+        Map<String, Object> resultMap = JsonUtil.jsonToMap(result);
+        return resultMap.get("access_token").toString();
     }
 
     public static String post(String requestUrl, String accessToken, String params)

@@ -45,7 +45,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public RestErrorResponse customException(MethodArgumentNotValidException  exception) {
+    public RestErrorResponse customException(MethodArgumentNotValidException exception) {
 
         BindingResult bindingResult = exception.getBindingResult();
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
@@ -62,6 +62,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 系统异常的捕获及处理
+     *
      * @param exception 系统异常
      * @return 通用出错提示
      */
@@ -70,6 +71,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public RestErrorResponse exception(Exception exception) {
         log.error("【系统异常】{}", exception.getMessage(), exception);
+
+        exception.printStackTrace();
+
+        if(exception.getMessage().equals("不允许访问")){
+            return new RestErrorResponse("没有操作此功能的权限");
+        }
+
+
         return new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
     }
 

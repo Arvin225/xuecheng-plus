@@ -41,7 +41,6 @@ public class PasswordAuthServiceImpl implements AuthService {
         if (!verify) {
             throw new RuntimeException("验证码错误");
         }
-
         //账号
         String username = authParamsDto.getUsername();
         XcUser user = xcUserMapper.selectOne(new LambdaQueryWrapper<XcUser>().eq(XcUser::getUsername, username));
