@@ -1,5 +1,6 @@
 package com.xuecheng.learning.api;
 
+import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.model.PageResult;
 import com.xuecheng.learning.model.dto.MyCourseTableParams;
 import com.xuecheng.learning.model.dto.XcChooseCourseDto;
@@ -50,7 +51,16 @@ public class MyCourseTablesController {
     @ApiOperation("我的课程表")
     @GetMapping("/mycoursetable")
     public PageResult<XcCourseTables> mycoursetable(MyCourseTableParams params) {
-        return null;
+        //登录用户
+        SecurityUtil.XcUser user = SecurityUtil.getUser();
+        if (user == null) {
+            XueChengPlusException.cast("请登录后继续选课");
+        }
+        String userId = user.getId();
+        //设置当前的登录用户
+        params.setUserId(userId);
+
+        return myCourseTablesService.myCourseTables(params);
     }
 
 }

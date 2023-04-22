@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * @description 内容管理远程接口
  * @date 2022/10/25 9:13
  */
-@FeignClient(value = "content-api",fallbackFactory = ContentServiceClientFallbackFactory.class)
+@FeignClient(value = "content-api", fallbackFactory = ContentServiceClientFallbackFactory.class)
 public interface ContentServiceClient {
 
     @ResponseBody
     @GetMapping("/content/r/coursepublish/{courseId}")
-    public CoursePublish getCoursePublish(@PathVariable("courseId") Long courseId);
+    CoursePublish getCoursePublish(@PathVariable("courseId") Long courseId);
 
 }

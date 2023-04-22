@@ -71,12 +71,4 @@ public class CourseBaseInfoController {
         courseBaseInfoService.deleteById(courseId);
     }
 
-    @ApiOperation("查询课程全部信息")
-    @GetMapping("/course/whole/{courseId}")
-    public CoursePreviewDto getPreviewInfo(@PathVariable("courseId") Long courseId){
-        return coursePublishService.getCoursePreviewInfo(courseId);
-    }
-
-
-
 }

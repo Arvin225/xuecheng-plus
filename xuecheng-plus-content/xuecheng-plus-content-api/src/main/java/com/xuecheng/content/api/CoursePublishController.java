@@ -67,5 +67,11 @@ public class CoursePublishController {
         return coursePublish;
     }
 
+    @ApiOperation("获取课程发布信息")
+    @GetMapping("/course/whole/{courseId}")
+    public CoursePreviewDto getPreviewInfo(@PathVariable("courseId") Long courseId){
+        return coursePublishService.getCoursePreviewInfo(courseId);
+    }
+
 
 }

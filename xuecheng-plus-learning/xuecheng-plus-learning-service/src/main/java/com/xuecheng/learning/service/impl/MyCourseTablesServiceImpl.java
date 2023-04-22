@@ -1,11 +1,14 @@
 package com.xuecheng.learning.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.base.model.PageResult;
 import com.xuecheng.content.model.po.CoursePublish;
 import com.xuecheng.learning.feignclient.ContentServiceClient;
 import com.xuecheng.learning.mapper.XcChooseCourseMapper;
 import com.xuecheng.learning.mapper.XcCourseTablesMapper;
+import com.xuecheng.learning.model.dto.MyCourseTableParams;
 import com.xuecheng.learning.model.dto.XcChooseCourseDto;
 import com.xuecheng.learning.model.dto.XcCourseTablesDto;
 import com.xuecheng.learning.model.po.XcChooseCourse;
@@ -24,10 +27,10 @@ import java.util.List;
 @Service
 public class MyCourseTablesServiceImpl implements MyCourseTablesService {
     @Autowired
-    XcChooseCourseMapper xcChooseCourseMapper;
+    XcChooseCourseMapper chooseCourseMapper;
 
     @Autowired
-    XcCourseTablesMapper xcCourseTablesMapper;
+    XcCourseTablesMapper courseTablesMapper;
 
     @Autowired
     ContentServiceClient contentServiceClient;
@@ -131,7 +134,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
             return false;
         }
 
-        XcChooseCourse chooseCourse = xcChooseCourseMapper.selectById(chooseCourseId);
+        XcChooseCourse chooseCourse = chooseCourseMapper.selectById(chooseCourseId);
         if (chooseCourse == null) {
             log.debug("课程支付成功，但选课状态修改失败，因为选课记录为空，选课id：{}", chooseCourseId);
             return false;
@@ -141,7 +144,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         if (!"701001".equals(chooseCourse.getStatus())) {
             //修改选课状态为选课成功
             chooseCourse.setStatus("701001");
-            int i = xcChooseCourseMapper.updateById(chooseCourse);
+            int i = chooseCourseMapper.updateById(chooseCourse);
             if (i < 1) {
                 log.debug("课程支付成功，但选课状态修改失败，选课id：{}，选课详情：{}", chooseCourseId, chooseCourse);
                 return false;
@@ -152,6 +155,29 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         addCourseTables(chooseCourse);
 
         return true;
+    }
+
+    @Override
+    public PageResult<XcCourseTables> myCourseTables(MyCourseTableParams params) {
+
+        //页码
+        long pageNo = params.getPage();
+        //每页记录数,固定为4
+        long pageSize = 4;
+        //分页条件
+        Page<XcCourseTables> page = new Page<>(pageNo, pageSize);
+        //根据用户id查询
+        String userId = params.getUserId();
+        LambdaQueryWrapper<XcCourseTables> lambdaQueryWrapper = new LambdaQueryWrapper<XcCourseTables>().eq(XcCourseTables::getUserId, userId);
+
+        //分页查询
+        Page<XcCourseTables> pageResult = courseTablesMapper.selectPage(page, lambdaQueryWrapper);
+        List<XcCourseTables> records = pageResult.getRecords();
+        //记录总数
+        long total = pageResult.getTotal();
+        PageResult<XcCourseTables> courseTablesResult = new PageResult<>(records, total, pageNo, pageSize);
+        return courseTablesResult;
+
     }
 
     /**
@@ -168,7 +194,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .eq(XcCourseTables::getUserId, userId)
                 .eq(XcCourseTables::getCourseId, courseId);
 
-        XcCourseTables xcCourseTables = xcCourseTablesMapper.selectOne(queryWrapper);
+        XcCourseTables xcCourseTables = courseTablesMapper.selectOne(queryWrapper);
         return xcCourseTables;
     }
 
@@ -195,7 +221,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .eq(XcChooseCourse::getStatus, "701001")//选课状态为“成功”
                 .gt(XcChooseCourse::getValidtimeEnd, LocalDateTime.now());//课程未过期
         //这里不用selectOne()是因为业务表没有唯一约束，可能出现重复记录，强行使用的话会报异常
-        List<XcChooseCourse> xcChooseCourses = xcChooseCourseMapper.selectList(queryWrapper);
+        List<XcChooseCourse> xcChooseCourses = chooseCourseMapper.selectList(queryWrapper);
         //表中已有记录则直接返回
         if (xcChooseCourses != null && xcChooseCourses.size() > 0) {
             log.debug("重复添加，选课表中已有该课程，课程id：{}，用户id：{}", coursePublish.getId(), userId);
@@ -218,7 +244,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         chooseCourse.setValidtimeEnd(LocalDateTime.now().plusDays(365));//课程过期时间，生效时间加上有效期
 
         //插入
-        int insert = xcChooseCourseMapper.insert(chooseCourse);
+        int insert = chooseCourseMapper.insert(chooseCourse);
         if (insert < 1) {
             log.error("添加免费课程到选课记录表失败，课程id：{}，用户id：{}", chooseCourse.getCourseId(), userId);
             XueChengPlusException.cast("选课失败");
@@ -256,7 +282,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         queryWrapper.eq(XcCourseTables::getUserId, chooseCourse.getUserId())
                 .eq(XcCourseTables::getCourseId, chooseCourse.getCourseId());
         //这里直接使用selectOne()，因为对应业务表中有唯一约束，不会出现重复记录
-        XcCourseTables courseTables = xcCourseTablesMapper.selectOne(queryWrapper);
+        XcCourseTables courseTables = courseTablesMapper.selectOne(queryWrapper);
         //已有课程直接返回
         if (courseTables != null) {
             return courseTables;
@@ -272,7 +298,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
         courseTables.setCourseType(chooseCourse.getOrderType());//课程类型，即选课类型：收费/免费
         courseTables.setUpdateDate(LocalDateTime.now());//更新时间
 
-        int insert = xcCourseTablesMapper.insert(courseTables);
+        int insert = courseTablesMapper.insert(courseTables);
         if (insert < 1) {
             log.error("添加课程到课程表失败，选课id：{}，用户id：{}", courseTables.getChooseCourseId(), courseTables.getUserId());
             XueChengPlusException.cast("选课失败");
@@ -304,7 +330,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .eq(XcChooseCourse::getOrderType, "700002")//选课类型为“付费”
                 .eq(XcChooseCourse::getStatus, "701002");//选课状态为“待支付”
         //这里不用selectOne()是因为业务表没有唯一约束，可能出现重复记录，强行使用的话会报异常
-        List<XcChooseCourse> chooseCourses = xcChooseCourseMapper.selectList(queryWrapper);
+        List<XcChooseCourse> chooseCourses = chooseCourseMapper.selectList(queryWrapper);
         //表中已有记录则直接返回
         if (chooseCourses != null && chooseCourses.size() > 0) {
             log.debug("重复添加，选课表中已有该课程，课程id：{}，用户id：{}", coursePublish.getId(), userId);
@@ -329,7 +355,7 @@ public class MyCourseTablesServiceImpl implements MyCourseTablesService {
                 .plusDays(coursePublish.getValidDays()));//失效时间
 
         //插入
-        int insert = xcChooseCourseMapper.insert(chooseCourse);
+        int insert = chooseCourseMapper.insert(chooseCourse);
         if (insert < 1) {
             log.error("添加收费课程到选课记录表失败，课程id：{}，用户id：{}", chooseCourse.getCourseId(), userId);
             XueChengPlusException.cast("选课失败");
